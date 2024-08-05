@@ -1,13 +1,17 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import s from './weather-app.module.css'
 import searchIcon from '../assets/images/search.svg'
 import searchLocation from '../assets/images/location.svg'
 
 const WeatherApp = () => {
-    const [city, setCity] = useState('')
+    const [city, setCity] = useState(localStorage.getItem('city') || '')
     const [data, setData] = useState<any>(null)
     const [error, setError] = useState<any>(null)
-    const fetchWeather = async () => {
+    const searchWeather = async () => {
+        await fetchWeather(city)
+        localStorage.setItem('city', city);
+    }
+    const fetchWeather = async (city: string) => {
         setError(null)
         const apiKey = 'f2e7e1827b1c56c308ec3dc5989015a1'
         try {
@@ -24,13 +28,18 @@ const WeatherApp = () => {
             setError(e.message)
         }
     }
+    useEffect(() => {
+        if (city) {
+            fetchWeather(city)
+        }
+    }, [])
     return (
         <div className={s.window}>
             <div className={s.wrapper}>
                 <div className={s.inputAndBtnWrapper}>
                     <input className={s.searchInput} value={city} onChange={(e) => setCity(e.currentTarget.value)}
                            placeholder={'Search location'}/>
-                    <button onClick={fetchWeather} className={s.searchButton}>
+                    <button onClick={searchWeather} className={s.searchButton}>
                         <img src={searchIcon} alt={'search button'}/>
                     </button>
                 </div>
